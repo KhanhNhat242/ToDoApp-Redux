@@ -1,23 +1,34 @@
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
 import { store } from '../redux/Store'
-import { actionAdd, actionDelete } from '../redux/Actions'
+import { actionAdd, actionDelete, actionUpdate } from '../redux/Actions'
 
 const Home = () => {
     const [job, setJob] = useState('')
     const [jobs, setJobs] = useState([])
+    const [flag, setFlag] = useState(false)
 
     const handleAddJob = () => {
-        store.dispatch(actionAdd(job))
-        
-        setJobs(store.getState())
-        setJob('')
+        if(!flag){
+            store.dispatch(actionAdd(job))
+            
+            setJobs(store.getState())
+            setJob('')
+        }
     }
 
     const handleDeleteJob = (i) => {
         store.dispatch(actionDelete(i))
 
-        // console.log(store.getState())
+        setJobs(store.getState())
+    }
+
+    const handleUpdateJob = (i, job) => {
+        store.dispatch(actionUpdate({
+            index: i, 
+            job: job,
+        }))
+        
         setJobs(store.getState())
     }
 
@@ -27,7 +38,7 @@ const Home = () => {
         <View style={styles.inputWrapper}>
                 <TextInput style={styles.input} value={job} onChangeText={setJob}/>
                 <TouchableOpacity style={styles.addBtn} onPress={handleAddJob}>
-                    <Text style={styles.addTxt}>Add</Text>
+                    <Text style={styles.addTxt}>ADD</Text>
                 </TouchableOpacity>
         </View>
         <View style={styles.jobWrapper}>
@@ -36,7 +47,15 @@ const Home = () => {
                     <View style={styles.job} key={index}>
                         <Text style={styles.jobName}>{j}</Text>
                         <View style={styles.action}>
-                            <Text style={styles.edit}>Edit</Text>
+                            <Text style={[styles.edit, {display: `${flag ? 'none' : 'block' }`}]} onPress={() => {
+                                setFlag(!flag)
+                                setJob(j)
+                            }}>Edit</Text>
+                            <Text style={[styles.edit, {display: `${!flag ? 'none' : 'block' }`}]} onPress={() => {
+                                handleUpdateJob(index, job)
+                                setFlag(!flag)
+                                setJob('')
+                            }}>Update</Text>
                             <Text style={styles.delete} onPress={() => handleDeleteJob(index)}>X</Text>
                         </View>
                     </View>

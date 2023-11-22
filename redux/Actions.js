@@ -11,3 +11,10 @@ export const actionDelete = (data) => {
         payload: data,
     }
 }
+
+export const actionUpdate = (data) => {
+    return {
+        type: 'UPDATE',
+        payload: data,
+    }
+}
